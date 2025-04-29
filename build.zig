@@ -9,6 +9,8 @@ pub fn build(b: *std.Build) void {
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
+
+        // Suppress LLD warnings (idk why see https://github.com/Not-Nik/raylib-zig/issues/219)
         .use_lld = false,
     });
 
