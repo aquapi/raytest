@@ -1,17 +1,29 @@
 const std = @import("std");
-const ray = @cImport({
-    @cInclude("raylib.h");
-    @cInclude("raymath.h");
-});
+
+const ray = @import("./cray.zig");
+const lib = ray.lib;
 
 pub fn main() !void {
-    ray.InitWindow(1280, 720, "App");
-    defer ray.CloseWindow();
+    lib.InitWindow(1280, 720, "App");
+    defer lib.CloseWindow();
 
-    while (!ray.WindowShouldClose()) {
-        ray.BeginDrawing();
-        defer ray.EndDrawing();
+    lib.SetTargetFPS(60);
 
-        ray.ClearBackground(ray.SKYBLUE);
+    const bg = lib.GetColor(@bitCast(lib.GuiGetStyle(lib.DEFAULT, lib.BACKGROUND_COLOR)));
+
+    while (!lib.WindowShouldClose()) {
+        lib.BeginDrawing();
+        defer lib.EndDrawing();
+
+        lib.ClearBackground(bg);
+
+        if (lib.GuiButton(.{
+            .height = 100,
+            .width = 100,
+            .x = 100,
+            .y = 100,
+        }, "Hi") == 1) {
+            std.debug.print("Button pressed!\n", .{});
+        }
     }
 }

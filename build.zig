@@ -9,18 +9,30 @@ pub fn build(b: *std.Build) void {
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
-
-        // Suppress LLD warnings (idk why see https://github.com/Not-Nik/raylib-zig/issues/219)
-        .use_lld = false,
     });
 
-    // Link raylib
+    // Link raylib & raygui
     {
-        const raylib = b.dependency("raylib", .{
+        const raylib_dep = b.dependency("raylib", .{
             .target = target,
             .optimize = optimize,
+
+            .raudio = true,
+            .rmodels = true,
+            .rshapes = true,
+            .rtext = true,
+            .rtextures = true,
+
+            .shared = true,
         });
-        exe.linkLibrary(raylib.artifact("raylib"));
+
+        const raylib = raylib_dep.artifact("raylib");
+        @import("raylib").addRaygui(b, raylib, b.dependency("raygui", .{
+            .target = target,
+            .optimize = optimize,
+        }));
+
+        exe.linkLibrary(raylib);
     }
 
     b.installArtifact(exe);
